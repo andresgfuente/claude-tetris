@@ -159,6 +159,7 @@ Cuando una pieza recién generada ya colisiona al aparecer (`spawn`), se dispara
 ├── index.html      # Estructura del DOM y canvas
 ├── style.css       # Estilos del juego (dark theme)
 ├── game.js         # Toda la lógica del Tetris (~300 líneas)
+├── skins.js        # Temas visuales (SKINS) y selector
 └── README.md
 ```
 
@@ -173,9 +174,22 @@ Algunos parámetros fáciles de tunear en `game.js`:
 | `COLS`         | Columnas del tablero                     | `10`                  |
 | `ROWS`         | Filas del tablero                        | `20`                  |
 | `BLOCK`        | Tamaño en píxeles de cada celda          | `30`                  |
-| `COLORS`       | Paleta de colores por tipo de pieza      | 7 colores             |
+| `SKINS[x].colors` | Paleta por tipo de pieza (en `skins.js`) | 7 colores por skin    |
 | `LINE_SCORES`  | Puntos por 1, 2, 3 o 4 líneas eliminadas | `[0,100,300,500,800]` |
 | `dropInterval` | Velocidad inicial de caída en ms         | `1000`                |
+
+### Skins (temas visuales)
+
+El selector **SKIN** del panel cambia la apariencia al instante (sin recargar, también en pausa) y la elección se guarda en `localStorage['tetris-skin']`. Las skins viven en `skins.js` (objeto `SKINS`):
+
+| Skin        | Aspecto                                                            |
+| ----------- | ------------------------------------------------------------------ |
+| `retro`     | Bloques cuadrados con colores planos (por defecto)                 |
+| `neon`      | Fondo negro, colores saturados y _glow_ con `shadowBlur`           |
+| `pastel`    | Colores suaves y bordes redondeados (`roundRect`)                  |
+| `pixel`     | Textura de damero de 4 px con bordes claros y oscuros              |
+
+Para añadir una skin nueva basta con agregar una entrada a `SKINS` con `name`, `colors[]`, `background`, `gridColor` y `drawBlock(ctx, px, py, size, color, alpha)`; el selector se rellena solo.
 
 > Si cambias `COLS`, `ROWS` o `BLOCK`, recuerda ajustar también `width` y `height` del `<canvas id="board">` en `index.html` para que coincida (`COLS × BLOCK` × `ROWS × BLOCK`).
 
