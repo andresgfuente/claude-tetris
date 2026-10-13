@@ -20,7 +20,8 @@ Implementación del clásico **Tetris** en JavaScript vanilla, usando HTML5 Canv
   - [Cómo funciona](#cómo-funciona)
     - [1. `index.html`](#1-indexhtml)
     - [2. `style.css`](#2-stylecss)
-    - [3. `game.js`](#3-gamejs)
+    - [3. `records.js`](#3-recordsjs)
+    - [4. `game.js`](#4-gamejs)
     - [Flujo del juego](#flujo-del-juego)
   - [Tecnologías](#tecnologías)
   - [Estructura del proyecto](#estructura-del-proyecto)
@@ -43,6 +44,8 @@ Es una versión jugable del Tetris clásico con todas las mecánicas que esperar
 - **Niveles** que aumentan cada 10 líneas y aceleran la caída.
 - **Menú de pausa** (`P` / `Esc`) con Reanudar, Reiniciar, Ver controles y Nivel inicial (1–15, guardado en `localStorage` y aplicado en la siguiente partida). Los inputs del juego quedan bloqueados mientras está abierto y ~150 ms tras reanudar.
 - **Game Over** con opción de reinicio.
+- **Pantalla de inicio** con botón "Jugar" (la partida ya no arranca sola).
+- **Tabla de récords local** (Top 5) guardada en `localStorage`: nombre (máx. 12 caracteres, Enter para guardar), puntuación, líneas y mejor combo de cada partida. La fila nueva se resalta y se muestran el mejor combo y las líneas máximas históricos. Botón "Resetear récords" con confirmación dentro de la página.
 
 ---
 
@@ -91,7 +94,7 @@ Después abre `http://localhost:8000` en el navegador.
 
 ## Cómo funciona
 
-El juego se compone de tres archivos que cooperan:
+El juego se compone de cuatro archivos que cooperan:
 
 ### 1. `index.html`
 
@@ -105,7 +108,11 @@ Define la estructura visual:
 
 Aporta el aspecto visual con estética _dark / retro arcade_: fondo oscuro, tipografía monoespaciada para los marcadores y _backdrop blur_ en los overlays.
 
-### 3. `game.js`
+### 3. `records.js`
+
+Lógica de la tabla de récords (objeto global `Records`). Guarda el Top 5 `{name, score, lines, maxCombo, date}` en `localStorage['tetris-records']` y el mejor combo / líneas máximas históricos en `localStorage['tetris-records-best']`. Todas las lecturas y escrituras van en `try/catch`, así que el juego funciona sin `localStorage`. Los nombres se pintan con `textContent`. `game.js` llama a `Records.onGameOver()` al terminar y a `Records.hideZone()` al iniciar; el botón "Jugar" de `#start-screen` llama a `init()`.
+
+### 4. `game.js`
 
 Contiene toda la lógica del juego. A grandes rasgos:
 
@@ -117,6 +124,7 @@ Contiene toda la lógica del juego. A grandes rasgos:
 - **Limpieza de líneas** (`clearLines`): recorre el tablero de abajo hacia arriba; cada fila completa se elimina y se inserta una vacía en la cima.
 - **Puntuación**: usa la tabla clásica `[0, 100, 300, 500, 800]` multiplicada por el nivel actual; el hard drop suma 2 puntos por celda recorrida y el soft drop 1 punto por fila.
 - **Nivel y velocidad**: el nivel sube cada 10 líneas; la velocidad de caída se calcula como `max(100, 1000 − (level − 1) × 90)` milisegundos.
+- **Combo**: `combo` cuenta los bloqueos consecutivos que limpian líneas (vuelve a 0 si un bloqueo no limpia ninguna); `maxCombo` guarda el máximo de la partida.
 - **Ghost piece** (`ghostY`): proyecta la posición final de la pieza actual hacia abajo y la dibuja con `globalAlpha = 0.2`.
 
 ### Flujo del juego
@@ -137,7 +145,7 @@ init()
    keydown → mover / rotar / soft-drop / hard-drop / pausa
 ```
 
-Cuando una pieza recién generada ya colisiona al aparecer (`spawn`), se dispara `endGame()` y se muestra el overlay de **Game Over**.
+Cuando una pieza recién generada ya colisiona al aparecer (`spawn`), se dispara `endGame()` y se muestra el overlay de **Game Over**, que llama a `Records.onGameOver()`: si la puntuación entra en el Top 5 aparece "¡Nuevo récord!" con el campo de nombre. La partida empieza desde la pantalla de inicio (botón "Jugar").
 
 ---
 
@@ -162,6 +170,7 @@ Cuando una pieza recién generada ya colisiona al aparecer (`spawn`), se dispara
 ├── pause-menu.js   # Menú de pausa y nivel inicial
 ├── game.js         # Toda la lógica del Tetris (~300 líneas)
 ├── skins.js        # Temas visuales (SKINS) y selector
+├── records.js      # Tabla de récords local (localStorage)
 └── README.md
 ```
 

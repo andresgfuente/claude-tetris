@@ -33,6 +33,7 @@ const restartBtn = document.getElementById('restart-btn');
 
 let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
 let runStartLevel = 1; // nivel inicial de la partida en curso (snapshot de startLevel)
+let combo = 0, maxCombo = 0; // bloqueos consecutivos que limpian líneas
 
 function createBoard() {
   return Array.from({ length: ROWS }, () => new Array(COLS).fill(0));
@@ -95,6 +96,8 @@ function clearLines() {
       r++;
     }
   }
+  combo = cleared ? combo + 1 : 0;
+  maxCombo = Math.max(maxCombo, combo);
   if (cleared) {
     lines += cleared;
     score += (LINE_SCORES[cleared] || 0) * level;
@@ -212,6 +215,7 @@ function endGame() {
   overlayTitle.textContent = 'GAME OVER';
   overlayScore.textContent = `Puntuación: ${score.toLocaleString()}`;
   overlay.classList.remove('hidden');
+  if (typeof Records !== 'undefined') Records.onGameOver(score, lines, maxCombo);
 }
 
 function togglePause() {
@@ -252,6 +256,9 @@ function init() {
   level = runStartLevel;
   paused = false;
   gameOver = false;
+  combo = 0;
+  maxCombo = 0;
+  if (typeof Records !== 'undefined') Records.hideZone();
   dropInterval = Math.max(100, 1000 - (runStartLevel - 1) * 90);
   dropAccum = 0;
   lastTime = performance.now();
@@ -265,6 +272,8 @@ function init() {
 }
 
 document.addEventListener('keydown', e => {
+  // Sin partida iniciada, o escribiendo en un campo de texto: no interceptar teclas
+  if (!current || (e.target && e.target.tagName === 'INPUT')) return;
   if (e.code === 'KeyP' || e.code === 'Escape') {
     if (!e.repeat) togglePause();
     return;
@@ -297,4 +306,4 @@ document.addEventListener('keydown', e => {
 
 restartBtn.addEventListener('click', init);
 
-init();
+// La partida arranca desde la pantalla de inicio (botón "Jugar", en records.js).
