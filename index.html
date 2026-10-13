@@ -38,7 +38,7 @@
             <li><kbd>↑</kbd> rotar</li>
             <li><kbd>↓</kbd> bajar</li>
             <li><kbd>Space</kbd> caída</li>
-            <li><kbd>P</kbd> pausa</li>
+            <li><kbd>P</kbd> / <kbd>Esc</kbd> pausa</li>
           </ul>
         </div>
       </aside>
@@ -51,8 +51,34 @@
         <button id="restart-btn">Reiniciar</button>
       </div>
     </div>
+
+    <div id="pause-menu" class="overlay hidden" role="dialog" aria-modal="true" aria-label="Menú de pausa">
+      <div class="overlay-box pause-box">
+        <p class="pause-title">PAUSA</p>
+        <button id="pm-resume" class="menu-btn" type="button">Reanudar</button>
+        <button id="pm-restart" class="menu-btn" type="button">Reiniciar</button>
+        <button id="pm-controls-toggle" class="menu-btn" type="button" aria-expanded="false" aria-controls="pm-controls">Ver controles</button>
+        <ul id="pm-controls" class="pm-controls hidden">
+          <li><kbd>←</kbd><kbd>→</kbd> mover</li>
+          <li><kbd>↑</kbd> / <kbd>X</kbd> rotar</li>
+          <li><kbd>↓</kbd> bajar</li>
+          <li><kbd>Space</kbd> caída</li>
+          <li><kbd>P</kbd> / <kbd>Esc</kbd> pausa</li>
+        </ul>
+        <div id="pm-level-row" class="pm-level-row">
+          <span class="label">NIVEL INICIAL</span>
+          <div class="pm-stepper">
+            <button id="pm-level-down" class="step-btn" type="button" aria-label="Bajar nivel inicial">−</button>
+            <span id="pm-level-value" class="value">1</span>
+            <button id="pm-level-up" class="step-btn" type="button" aria-label="Subir nivel inicial">+</button>
+          </div>
+          <span class="pm-hint">Se aplica en la próxima partida</span>
+        </div>
+      </div>
+    </div>
   </div>
 
+  <script src="pause-menu.js"></script>
   <script src="game.js"></script>
 </body>
 </html>
